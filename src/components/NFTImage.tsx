@@ -1,16 +1,18 @@
 import { Contract, ethers } from "ethers";
 import React, { useEffect, useState } from "react";
-import { contract, signer } from "./Home";
+import { toast } from "react-toastify";
+import amirContract from "../service/contract";
 
 interface IProps {
   tokenId: number;
+  onImageMinted?: () => void;
 }
 
-const NFTImage: React.FC<IProps> = ({ tokenId }) => {
-  const contentId = ""; // comes from pinata
+const NFTImage: React.FC<IProps> = ({ tokenId, onImageMinted }) => {
+  const contentId = "some_digital_asset_on_IPFS"; // comes from pinata
   const metadataURI = `${contentId}/${tokenId}.json`;
+  const imageURI = `img/${tokenId}.jpg`;
   //   const imageURI = `https://gateway.pinata.cloud/ipfs/${contentId}/${tokenId}.png`;
-  const imageURI = `img/${tokenId}.png`;
 
   const [isMinted, setMinted] = useState(false);
 
@@ -19,31 +21,26 @@ const NFTImage: React.FC<IProps> = ({ tokenId }) => {
   }, [isMinted]);
 
   const getMintedStatus = async () => {
-    const result = await contract.isContentOwned(metadataURI);
-    console.log(result);
-    setMinted(result);
+    const isOwned = await amirContract.isContentOwned(metadataURI);
+    setMinted(isOwned);
   };
 
   const mintToken = async () => {
-    const connection = contract.connect(signer);
-    const addr = connection.address;
-    const result = await contract.payToMint(addr, metadataURI, {
-      value: ethers.utils.parseEther("0.05"),
-    });
-
-    await result.wait();
+    await amirContract.mintToken(metadataURI);
     await getMintedStatus();
+    if (onImageMinted) await onImageMinted();
   };
 
   async function getURI() {
-    const uri = await contract.tokenURI(tokenId);
-    return uri;
+    console.log({ tokenId });
+    const uri = await amirContract.getURI(tokenId - 1);
+    toast.info(uri);
   }
 
   return (
     <div
       style={{
-        borderRadius: 8, 
+        borderRadius: 8,
         boxShadow: "0 0 10px rgba(0,0,0,0.5)",
       }}
     >

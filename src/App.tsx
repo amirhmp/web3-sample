@@ -4,13 +4,16 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 import Install from "./components/Install";
 import Home from "./components/Home";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-  if ((window as any).ethereum) {
-    return <Home />;
-  } else {
-    return <Install />;
-  }
+  return (
+    <div>
+      {(window as any).ethereum ? <Home /> : <Install />}
+      <ToastContainer />
+    </div>
+  );
 }
 
 export default App;

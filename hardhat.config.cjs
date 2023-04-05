@@ -6,4 +6,10 @@ module.exports = {
   paths: {
     artifacts: "./src/artifacts",
   },
+  networks: {
+    hardhat: {
+      // url: process.env.RPC_URL,
+      chainId: 1337,
+    },
+  },
 };
